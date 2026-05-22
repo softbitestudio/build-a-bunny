@@ -1,0 +1,3 @@
+-keep class com.softbite.buildabunny.data.model.** { *; }
+-keepattributes *Annotation*
+-dontwarn kotlinx.serialization.**
