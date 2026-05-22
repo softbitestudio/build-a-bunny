@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Build a Bunny</string>
+    <string name="creator_title">Create Your Bunny</string>
+    <string name="gallery_title">My Bunnies</string>
+    <string name="save_character">Save</string>
+    <string name="delete_character">Delete</string>
+    <string name="new_character">New Bunny</string>
+    <string name="character_name_hint">Bunny name…</string>
+    <string name="no_saved_characters">No bunnies saved yet.\nCreate your first one!</string>
+    <string name="saved_successfully">Bunny saved!</string>
+    <string name="deleted_successfully">Bunny deleted</string>
+    <string name="content_description_bunny_preview">Bunny character preview</string>
+    <string name="content_description_category_tab">Category: %1$s</string>
+    <string name="content_description_option_selected">%1$s, selected</string>
+    <string name="content_description_option">%1$s</string>
+</resources>
