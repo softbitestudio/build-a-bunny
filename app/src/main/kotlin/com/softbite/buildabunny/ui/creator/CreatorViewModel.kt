@@ -3,6 +3,7 @@ package com.softbite.buildabunny.ui.creator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.softbite.buildabunny.data.model.CustomizationCategory
+import com.softbite.buildabunny.data.model.CharacterConfig
 import com.softbite.buildabunny.data.repository.CharacterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,10 +16,12 @@ class CreatorViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        CreatorUiState(
-            config = characterId?.let { repository.find(it) } ?: CreatorUiState().config,
-            isSaved = characterId != null,
-        )
+        characterId?.let { repository.find(it) }.let { found ->
+            CreatorUiState(
+                config = found ?: CharacterConfig(),
+                isSaved = found != null,
+            )
+        }
     )
     val uiState: StateFlow<CreatorUiState> = _uiState.asStateFlow()
 

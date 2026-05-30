@@ -44,10 +44,9 @@ fun CreatorScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.snackbarMessage) {
-        state.snackbarMessage?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.snackbarShown()
-        }
+        val msg = state.snackbarMessage ?: return@LaunchedEffect
+        viewModel.snackbarShown() // clear before suspending so it's always called even if cancelled
+        snackbarHostState.showSnackbar(msg)
     }
 
     Scaffold(

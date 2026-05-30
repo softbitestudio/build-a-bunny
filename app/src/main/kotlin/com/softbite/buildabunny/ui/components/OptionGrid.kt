@@ -65,8 +65,6 @@ private fun OptionCell(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val borderColor = if (isSelected) SelectedBorder else Color.Transparent
-    val borderWidth = if (isSelected) 2.5.dp else 0.dp
     val semanticLabel = if (isSelected) "${option.label}, selected" else option.label
 
     Surface(
@@ -74,7 +72,7 @@ private fun OptionCell(
         tonalElevation = if (isSelected) 4.dp else 1.dp,
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .border(borderWidth, borderColor, RoundedCornerShape(12.dp))
+            .then(if (isSelected) Modifier.border(2.5.dp, SelectedBorder, RoundedCornerShape(12.dp)) else Modifier)
             .clickable { onClick() }
             .semantics { contentDescription = semanticLabel },
     ) {
