@@ -1,5 +1,12 @@
 # 🐰 Build a Bunny
 
+![Platform](https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white)
+![Kotlin](https://img.shields.io/badge/kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-1.6-4285F4?logo=jetpackcompose&logoColor=white)
+![Min SDK](https://img.shields.io/badge/minSdk-26%20(Android%208.0)-orange)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+![Status](https://img.shields.io/badge/status-In%20Development-FF69B4)
+
 A character creator app for Android where you design your own anthropomorphic bunny — mix and match fur, ears, eyes, accessories, and more to build a unique character, then save your collection to a personal gallery.
 
 ---
