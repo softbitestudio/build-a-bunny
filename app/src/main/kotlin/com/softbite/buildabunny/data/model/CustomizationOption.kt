@@ -28,7 +28,7 @@ object CustomizationOptions {
     )
 
     val earStyles = listOf(
-        CustomizationOption("upright", "Upright", CustomizationCategory.EAR_STYLE, description = "Straight upright ears"),
+        CustomizationOption("upright", "Standing", CustomizationCategory.EAR_STYLE, description = "Tall standing ears"),
         CustomizationOption("floppy", "Floppy", CustomizationCategory.EAR_STYLE, description = "Both ears flopped down"),
         CustomizationOption("lop", "Lop", CustomizationCategory.EAR_STYLE, description = "One ear up, one flopped"),
     )
