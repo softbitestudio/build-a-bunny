@@ -6,20 +6,23 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.softbite.buildabunny.data.repository.CharacterRepository
 import com.softbite.buildabunny.navigation.AppNavGraph
+import com.softbite.buildabunny.receipts.data.repository.ReceiptRepository
 import com.softbite.buildabunny.ui.theme.BuildABunnyTheme
 
 class MainActivity : ComponentActivity() {
 
-    // In a production app this would be injected (e.g. Hilt/Koin).
-    // Kept as a field here so it survives configuration changes via the activity scope.
-    private val repository = CharacterRepository()
+    private val characterRepository = CharacterRepository()
+    private val receiptRepository = ReceiptRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             BuildABunnyTheme {
-                AppNavGraph(repository = repository)
+                AppNavGraph(
+                    characterRepository = characterRepository,
+                    receiptRepository = receiptRepository,
+                )
             }
         }
     }
