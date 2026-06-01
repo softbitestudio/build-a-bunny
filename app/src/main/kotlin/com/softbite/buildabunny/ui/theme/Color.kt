@@ -13,3 +13,10 @@ val BunnySurface = Color(0xFFFFFBFE)
 val BunnyOnSurface = Color(0xFF1C1B1F)
 val BunnyOutline = Color(0xFF79747E)
 val SelectedBorder = Color(0xFFE91E63)
+
+// Receipts / Misty palette
+val MistyPurple = Color(0xFF8B5CF6)
+val MistyPurpleDark = Color(0xFF6D28D9)
+val MistyPurpleLight = Color(0xFFEDE9FE)
+val ReceiptsAccent = Color(0xFFEC4899)
+val ReceiptsDark = Color(0xFF1A0A2E)
