@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Receipts — Because your memory isn't the problem. The app that documents what actually happened.">
+  <title>Receipts — Because your memory isn't the problem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #8B5CF6;
+      --purple-dark: #6D28D9;
+      --purple-light: #EDE9FE;
+      --pink: #EC4899;
+      --ink: #1A0A2E;
+      --surface: #F5EEFF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ─────────────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 40px;
+      background: rgba(245, 238, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.10);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none;
+    }
+    .nav-cta {
+      background: var(--pink); color: white; border: none;
+      padding: 10px 22px; border-radius: 12px;
+      font-family: inherit; font-weight: 600; font-size: 14px;
+      cursor: pointer; text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(236,72,153,.38); }
+
+    /* ── Hero ────────────────────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      background: var(--ink);
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 112px 72px 80px; gap: 48px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute;
+      top: -30%; right: -15%; width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(139,92,246,.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute;
+      bottom: -20%; left: -10%; width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(236,72,153,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(139,92,246,.14); border: 1px solid rgba(139,92,246,.28);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 13px; font-weight: 500; color: #C4B5FD;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5.5vw, 68px); font-weight: 800;
+      line-height: 1.07; color: white; margin-bottom: 22px;
+    }
+    .hero h1 .pink { color: var(--pink); }
+    .hero h1 .lavender { color: #C4B5FD; }
+    .hero-sub {
+      font-size: 18px; line-height: 1.65;
+      color: rgba(255,255,255,.62); margin-bottom: 36px; max-width: 480px;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--pink); color: white; border: none;
+      padding: 16px 30px; border-radius: 16px;
+      font-family: inherit; font-weight: 700; font-size: 16px;
+      cursor: pointer; text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(236,72,153,.45); }
+    .hero-tagline { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,.35); font-style: italic; }
+    .hero-visual { display: flex; justify-content: center; align-items: center; }
+    .misty-hero {
+      animation: float 4s ease-in-out infinite;
+      filter: drop-shadow(0 24px 48px rgba(139,92,246,.45));
+    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+
+    /* ── Scroll strip ────────────────────────────────────────────────────────── */
+    .strip { background: var(--purple); padding: 16px 0; overflow: hidden; }
+    .strip-track {
+      display: flex; gap: 0;
+      animation: marquee 28s linear infinite;
+      width: max-content;
+    }
+    .strip-item {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+      font-size: 14px; font-weight: 600; color: white;
+      padding: 0 40px;
+    }
+    .strip-item::after { content: '·'; margin-left: 40px; opacity: .5; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ── Section shared ──────────────────────────────────────────────────────── */
+    .section-label {
+      display: inline-block; background: var(--purple); color: white;
+      font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 100px; margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 46px); font-weight: 800;
+      line-height: 1.12; margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 17px; color: rgba(26,10,46,.58);
+      line-height: 1.65; max-width: 520px; margin-bottom: 56px;
+    }
+
+    /* ── Features ────────────────────────────────────────────────────────────── */
+    .features { padding: 96px 72px; background: var(--purple-light); }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px;
+    }
+    .feature-card {
+      background: white; border-radius: 24px; padding: 28px;
+      box-shadow: 0 2px 12px rgba(139,92,246,.07);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(139,92,246,.14); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 18px;
+    }
+    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 15px; line-height: 1.65; color: rgba(26,10,46,.62); }
+
+    /* ── How it works ────────────────────────────────────────────────────────── */
+    .how { padding: 96px 72px; background: white; }
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; margin-top: 56px; position: relative; }
+    .steps::before {
+      content: ''; position: absolute;
+      top: 36px; left: 17%; right: 17%; height: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+    }
+    .step { text-align: center; position: relative; }
+    .step-num {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--ink); color: white;
+      font-size: 22px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 22px;
+      box-shadow: 0 0 0 5px var(--surface), 0 0 0 9px var(--purple);
+    }
+    .step h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .step p { font-size: 15px; color: rgba(26,10,46,.60); line-height: 1.65; }
+
+    /* ── Archetypes ──────────────────────────────────────────────────────────── */
+    .archetypes { padding: 96px 72px; background: var(--ink); }
+    .archetypes .section-title { color: white; }
+    .archetypes .section-sub { color: rgba(255,255,255,.52); }
+    .archetype-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .archetype-card {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 22px; overflow: hidden;
+      transition: transform .25s, background .25s;
+    }
+    .archetype-card:hover { transform: translateY(-4px); background: rgba(255,255,255,.08); }
+    .archetype-header {
+      padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .archetype-name-group { display: flex; align-items: center; gap: 10px; }
+    .archetype-emoji { font-size: 26px; line-height: 1; }
+    .archetype-name { font-size: 15px; font-weight: 700; color: white; }
+    .archetype-tagline { font-size: 12px; color: rgba(255,255,255,.48); font-style: italic; margin-top: 2px; }
+    .level-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 100px; flex-shrink: 0; margin-top: 2px; }
+    .level-1 { background: rgba(16,185,129,.15); color: #34D399; }
+    .level-2 { background: rgba(245,158,11,.15); color: #FCD34D; }
+    .level-3 { background: rgba(239,68,68,.15); color: #FCA5A5; }
+    .level-4 { background: rgba(139,92,246,.20); color: #C4B5FD; }
+    .archetype-body { padding: 16px 20px; }
+    .archetype-desc { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,.60); margin-bottom: 14px; }
+    .archetype-antidote {
+      background: rgba(139,92,246,.14); border-radius: 10px; padding: 12px 14px;
+      font-size: 13px; line-height: 1.55; color: #C4B5FD;
+    }
+    .archetype-antidote strong { color: #DDD6FE; display: block; margin-bottom: 3px; }
+    .archetypes-unlock {
+      text-align: center; margin-top: 40px;
+      font-size: 14px; color: rgba(255,255,255,.38); font-style: italic;
+    }
+
+    /* ── Quotes ──────────────────────────────────────────────────────────────── */
+    .quotes { padding: 96px 72px; background: var(--surface); }
+    .quotes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; margin-top: 56px; }
+    .quote-card { background: white; border-radius: 22px; padding: 28px; box-shadow: 0 2px 10px rgba(139,92,246,.06); }
+    .stars { color: #F59E0B; font-size: 15px; margin-bottom: 14px; }
+    .quote-text { font-size: 16px; line-height: 1.7; color: var(--ink); margin-bottom: 22px; font-style: italic; }
+    .quote-author { display: flex; align-items: center; gap: 12px; }
+    .quote-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .quote-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .quote-handle { font-size: 13px; color: rgba(26,10,46,.45); }
+
+    /* ── CTA ─────────────────────────────────────────────────────────────────── */
+    .cta-section {
+      padding: 100px 72px; background: var(--purple);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute;
+      top: -40%; left: -10%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255,255,255,.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-misty { margin: 0 auto 32px; display: block; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 16px 32px rgba(0,0,0,.3)); }
+    .cta-section h2 { font-size: clamp(30px, 4vw, 52px); font-weight: 800; color: white; line-height: 1.12; margin-bottom: 14px; }
+    .cta-section p { font-size: 18px; color: rgba(255,255,255,.72); margin-bottom: 40px; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: white; color: var(--purple-dark); border: none;
+      padding: 18px 38px; border-radius: 18px;
+      font-family: inherit; font-weight: 700; font-size: 17px;
+      cursor: pointer; text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.22); }
+
+    /* ── Footer ──────────────────────────────────────────────────────────────── */
+    footer {
+      background: var(--ink); padding: 48px 72px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-left { display: flex; flex-direction: column; gap: 4px; }
+    .footer-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: white; }
+    .footer-tagline { font-size: 13px; color: rgba(255,255,255,.38); font-style: italic; }
+    .footer-right { font-size: 13px; color: rgba(255,255,255,.28); }
+
+    /* ── Responsive ──────────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 100px 28px 64px; text-align: center; }
+      .hero-visual { order: -1; }
+      .hero-sub { max-width: 100%; margin: 0 auto 36px; }
+      .features, .how, .archetypes, .quotes, .cta-section { padding: 72px 24px; }
+      .steps { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+      .quotes-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 40px 24px; }
+      nav { padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="34" height="34" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="#9B59B6"/>
+      <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="#E8A0F0"/>
+      <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
+      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
+      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="#9B59B6"/>
+      <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="#E8A0F0"/>
+      <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
+      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
+      <ellipse cx="100" cy="116" rx="72" ry="60" fill="#9B59B6"/>
+      <ellipse cx="100" cy="61" rx="20" ry="8" fill="#BB77D4"/>
+      <circle cx="57" cy="129" r="20" fill="#E879F9" opacity=".22"/>
+      <circle cx="143" cy="129" r="20" fill="#E879F9" opacity=".22"/>
+      <circle cx="75" cy="105" r="18" fill="white"/>
+      <circle cx="75" cy="106" r="13" fill="#F5C518"/>
+      <circle cx="75" cy="106" r="9" fill="#D4AC0D"/>
+      <circle cx="75" cy="106" r="5" fill="#2A1040"/>
+      <circle cx="71" cy="102" r="3" fill="white"/>
+      <rect x="56" y="87" width="38" height="13" fill="#9B59B6"/>
+      <circle cx="125" cy="105" r="18" fill="white"/>
+      <circle cx="125" cy="106" r="13" fill="#F5C518"/>
+      <circle cx="125" cy="106" r="9" fill="#D4AC0D"/>
+      <circle cx="125" cy="106" r="5" fill="#2A1040"/>
+      <circle cx="121" cy="102" r="3" fill="white"/>
+      <rect x="106" y="87" width="38" height="13" fill="#9B59B6"/>
+      <polygon points="100,130 93,125 107,125" fill="#FFAFCC"/>
+      <line x1="100" y1="130" x2="100" y2="136" stroke="#2A1040" stroke-width="1" stroke-opacity=".22"/>
+      <path d="M87,138 C96,143 108,142 115,137" fill="none" stroke="#2A1040" stroke-width="2.2" stroke-opacity=".55" stroke-linecap="round"/>
+      <ellipse cx="100" cy="116" rx="72" ry="60" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
+    </svg>
+    Receipts
+  </a>
+  <a href="#download" class="nav-cta">Get the App</a>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div>
+    <div class="hero-badge">🧾 Now available on Android</div>
+    <h1>Your memory was <span class="pink">never</span> the <span class="lavender">problem.</span></h1>
+    <p class="hero-sub">Receipts is the app that documents what actually happened — with satirical validation from Misty, your pastel goth bunny archivist who believes you and has the logs to prove it.</p>
+    <a href="#download" class="hero-cta">📲 Drop a Receipt</a>
+    <p class="hero-tagline">"Because your memory isn't the problem."</p>
+  </div>
+  <div class="hero-visual">
+    <svg class="misty-hero" width="320" height="320" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="#9B59B6"/>
+      <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="#E8A0F0"/>
+      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="none" stroke="#2A1040" stroke-width="1.2" stroke-opacity=".28"/>
+      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="#9B59B6"/>
+      <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="#E8A0F0"/>
+      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="none" stroke="#2A1040" stroke-width="1.2" stroke-opacity=".28"/>
+      <ellipse cx="100" cy="116" rx="72" ry="60" fill="#9B59B6"/>
+      <ellipse cx="100" cy="61" rx="20" ry="8" fill="#BB77D4"/>
+      <circle cx="57" cy="129" r="20" fill="#E879F9" opacity=".22"/>
+      <circle cx="143" cy="129" r="20" fill="#E879F9" opacity=".22"/>
+      <circle cx="75" cy="105" r="18" fill="white"/>
+      <circle cx="75" cy="106" r="13" fill="#F5C518"/>
+      <circle cx="75" cy="106" r="9" fill="#D4AC0D"/>
+      <circle cx="75" cy="106" r="5" fill="#2A1040"/>
+      <circle cx="71" cy="102" r="3" fill="white"/>
+      <rect x="56" y="87" width="38" height="13" fill="#9B59B6"/>
+      <line x1="57" y1="122" x2="93" y2="122" stroke="#2A1040" stroke-width="1.1" stroke-opacity=".45" stroke-linecap="round"/>
+      <line x1="91" y1="118" x2="100" y2="110" stroke="#2A1040" stroke-width="1" stroke-opacity=".4" stroke-linecap="round"/>
+      <circle cx="125" cy="105" r="18" fill="white"/>
+      <circle cx="125" cy="106" r="13" fill="#F5C518"/>
+      <circle cx="125" cy="106" r="9" fill="#D4AC0D"/>
+      <circle cx="125" cy="106" r="5" fill="#2A1040"/>
+      <circle cx="121" cy="102" r="3" fill="white"/>
+      <rect x="106" y="87" width="38" height="13" fill="#9B59B6"/>
+      <line x1="107" y1="122" x2="143" y2="122" stroke="#2A1040" stroke-width="1.1" stroke-opacity=".45" stroke-linecap="round"/>
+      <line x1="141" y1="118" x2="150" y2="110" stroke="#2A1040" stroke-width="1" stroke-opacity=".4" stroke-linecap="round"/>
+      <polygon points="100,130 93,125 107,125" fill="#FFAFCC"/>
+      <line x1="100" y1="130" x2="100" y2="136" stroke="#2A1040" stroke-width="1" stroke-opacity=".2"/>
+      <path d="M87,138 C96,143 108,142 115,137" fill="none" stroke="#2A1040" stroke-width="2.4" stroke-opacity=".55" stroke-linecap="round"/>
+      <ellipse cx="100" cy="116" rx="72" ry="60" fill="none" stroke="#2A1040" stroke-width="1.4" stroke-opacity=".24"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ── Scroll strip ───────────────────────────────────────────────────────────── -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span class="strip-item">🧾 Document what actually happened</span>
+    <span class="strip-item">🤖 Misty's verdict is in</span>
+    <span class="strip-item">🚩 Pattern detected</span>
+    <span class="strip-item">💜 You are not tripping</span>
+    <span class="strip-item">📋 Screenshot-ready receipts</span>
+    <span class="strip-item">🧾 Document what actually happened</span>
+    <span class="strip-item">🤖 Misty's verdict is in</span>
+    <span class="strip-item">🚩 Pattern detected</span>
+    <span class="strip-item">💜 You are not tripping</span>
+    <span class="strip-item">📋 Screenshot-ready receipts</span>
+  </div>
+</div>
+
+<!-- ── Features ──────────────────────────────────────────────────────────────── -->
+<section class="features" id="features">
+  <span class="section-label">What it does</span>
+  <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+  <p class="section-sub">Four tools for the person who keeps explaining themselves and wondering why it never lands.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#EDE9FE">🧾</div>
+      <h3>Drop a Receipt</h3>
+      <p>Write what happened. Tag how you're feeling. File it before you talk yourself out of it or start second-guessing the timeline.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#FCE7F3">🤖</div>
+      <h3>Auto-Roast</h3>
+      <p>Misty reads your receipt and responds with a diagnosis, a roast, and a reality check. Satirical. Accurate. Slightly savage.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#FEF3C7">🤔</div>
+      <h3>Am I Tripping?</h3>
+      <p>Tap the button. Get a reality check. Misty confirms: your feelings are valid, your pattern recognition is working, and no, you are not tripping.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#ECFDF5">📊</div>
+      <h3>Pattern Report</h3>
+      <p>After 10 receipts, Misty identifies behavioral archetypes across your logs. The Deflector. The Alternate Reality Architect. The Moving Goalpost. Named and filed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ───────────────────────────────────────────────────────────── -->
+<section class="how" id="how">
+  <span class="section-label">How it works</span>
+  <h2 class="section-title">Three steps.<br>Zero gaslight.</h2>
+  <p class="section-sub">From "did that actually happen" to "Misty has confirmed it happened" in under a minute.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Drop a Receipt</h3>
+      <p>Write what happened. Tag the vibe — 😒😤🤡💀🙄😭⚡🚩. Don't soften it.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Misty Reviews</h3>
+      <p>She reads the receipt, issues a diagnosis, and provides a roast with clinical precision. No one asked. She did it anyway.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>The Pattern Emerges</h3>
+      <p>Log enough receipts and the behavioral archetype surfaces. Named, described, and shipped with an antidote.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Archetypes ─────────────────────────────────────────────────────────────── -->
+<section class="archetypes" id="archetypes">
+  <span class="section-label" style="background:rgba(139,92,246,.3);color:#C4B5FD">Behavioral Archetypes</span>
+  <h2 class="section-title">Misty has done the research.</h2>
+  <p class="section-sub">10 archetypes. 4 severity levels. Each one named, described, and shipped with an antidote. Unlock them after 10 receipts.</p>
+  <div class="archetype-grid">
+    <div class="archetype-card">
+      <div class="archetype-header">
+        <div class="archetype-name-group">
+          <span class="archetype-emoji">🌀</span>
+          <div>
+            <div class="archetype-name">The Reality Distorter</div>
+            <div class="archetype-tagline">"You were there. You saw it. Apparently neither of those things happened."</div>
+          </div>
+        </div>
+        <span class="level-badge level-3">L3</span>
+      </div>
+      <div class="archetype-body">
+        <p class="archetype-desc">Consistently rewrites events after the fact. Your clear memory of what happened is presented as confusion or misinterpretation.</p>
+        <div class="archetype-antidote">
+          <strong>💊 The Receipt Keeper</strong>
+          Document. Document. Document. Your memory is accurate — and receipts don't lie.
+        </div>
+      </div>
+    </div>
+    <div class="archetype-card">
+      <div class="archetype-header">
+        <div class="archetype-name-group">
+          <span class="archetype-emoji">🥅</span>
+          <div>
+            <div class="archetype-name">The Moving Goalpost</div>
+            <div class="archetype-tagline">"You meet the standard. The standard moves. Always."</div>
+          </div>
+        </div>
+        <span class="level-badge level-2">L2</span>
+      </div>
+      <div class="archetype-body">
+        <p class="archetype-desc">Whatever you do is never quite enough. Once you achieve what was asked, the criteria shift. Perfection is not the goal — your perpetual inadequacy is.</p>
+        <div class="archetype-antidote">
+          <strong>💊 The Boundary Setter</strong>
+          Stop running toward the goalpost. It will keep moving. Decide if you want to play this game.
+        </div>
+      </div>
+    </div>
+    <div class="archetype-card">
+      <div class="archetype-header">
+        <div class="archetype-name-group">
+          <span class="archetype-emoji">🏗️</span>
+          <div>
+            <div class="archetype-name">The Alternate Reality Architect</div>
+            <div class="archetype-tagline">"They built a narrative where they're always right."</div>
+          </div>
+        </div>
+        <span class="level-badge level-4">L4</span>
+      </div>
+      <div class="archetype-body">
+        <p class="archetype-desc">Constructs an elaborate alternative version of events in which their behavior is always justified and your perspective is always flawed.</p>
+        <div class="archetype-antidote">
+          <strong>💊 The External Validator</strong>
+          You cannot win an argument inside someone else's constructed reality. External support helps.
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="archetypes-unlock">+ 7 more archetypes unlock after 10 receipts — including The Deflector, The Weaponized Silence Expert, and The Emotional Accountant.</p>
+</section>
+
+<!-- ── Quotes ─────────────────────────────────────────────────────────────────── -->
+<section class="quotes">
+  <span class="section-label">Receipts filed</span>
+  <h2 class="section-title">People who needed this.</h2>
+  <p class="section-sub">From the group chat to the note app to here. Misty has seen things.</p>
+  <div class="quotes-grid">
+    <div class="quote-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote-text">"I filed three receipts in the first hour. Misty called it 'Selective Amnesia Syndrome™' and I felt seen for the first time in months."</p>
+      <div class="quote-author">
+        <div class="quote-avatar" style="background:#EDE9FE">😮‍💨</div>
+        <div>
+          <div class="quote-name">anon, probably</div>
+          <div class="quote-handle">in the group chat rn</div>
+        </div>
+      </div>
+    </div>
+    <div class="quote-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote-text">"The Am I Tripping? button should be legally required. The answer was no. It was never going to be yes. But I needed Misty to confirm it."</p>
+      <div class="quote-author">
+        <div class="quote-avatar" style="background:#FCE7F3">🤡</div>
+        <div>
+          <div class="quote-name">definitely not me</div>
+          <div class="quote-handle">crying in the car</div>
+        </div>
+      </div>
+    </div>
+    <div class="quote-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote-text">"After 10 receipts, Misty diagnosed The Moving Goalpost. I cried. Then I screenshotted the archetype card and sent it to my therapist."</p>
+      <div class="quote-author">
+        <div class="quote-avatar" style="background:#FEF9C3">⚡</div>
+        <div>
+          <div class="quote-name">receipts user #247</div>
+          <div class="quote-handle">currently in therapy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────────────── -->
+<section class="cta-section" id="download">
+  <svg class="cta-misty" width="110" height="110" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="rgba(255,255,255,.25)"/>
+    <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="rgba(255,255,255,.15)"/>
+    <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="rgba(255,255,255,.25)"/>
+    <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="rgba(255,255,255,.15)"/>
+    <ellipse cx="100" cy="116" rx="72" ry="60" fill="rgba(255,255,255,.2)"/>
+    <ellipse cx="100" cy="61" rx="20" ry="8" fill="rgba(255,255,255,.18)"/>
+    <circle cx="75" cy="105" r="18" fill="white" opacity=".9"/>
+    <circle cx="75" cy="106" r="13" fill="#F5C518"/>
+    <circle cx="75" cy="106" r="9" fill="#D4AC0D"/>
+    <circle cx="75" cy="106" r="5" fill="#2A1040"/>
+    <circle cx="71" cy="102" r="3" fill="white"/>
+    <rect x="56" y="87" width="38" height="13" fill="rgba(139,92,246,.6)"/>
+    <circle cx="125" cy="105" r="18" fill="white" opacity=".9"/>
+    <circle cx="125" cy="106" r="13" fill="#F5C518"/>
+    <circle cx="125" cy="106" r="9" fill="#D4AC0D"/>
+    <circle cx="125" cy="106" r="5" fill="#2A1040"/>
+    <circle cx="121" cy="102" r="3" fill="white"/>
+    <rect x="106" y="87" width="38" height="13" fill="rgba(139,92,246,.6)"/>
+    <polygon points="100,130 93,125 107,125" fill="#FFAFCC"/>
+    <path d="M87,138 C96,143 108,142 115,137" fill="none" stroke="#2A1040" stroke-width="2.4" stroke-opacity=".55" stroke-linecap="round"/>
+  </svg>
+  <h2>Ready to start<br>filing your truth?</h2>
+  <p>Misty is standing by. The archive is open. Your memory was never the problem — and now you'll have proof.</p>
+  <a href="#" class="cta-btn">📲 Download for Android</a>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-left">
+    <div class="footer-logo">
+      <svg width="28" height="28" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="#9B59B6"/>
+        <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="#9B59B6"/>
+        <ellipse cx="100" cy="116" rx="72" ry="60" fill="#9B59B6"/>
+        <circle cx="75" cy="105" r="14" fill="white"/>
+        <circle cx="75" cy="106" r="9" fill="#F5C518"/>
+        <circle cx="75" cy="106" r="4" fill="#2A1040"/>
+        <rect x="61" y="91" width="28" height="10" fill="#9B59B6"/>
+        <circle cx="125" cy="105" r="14" fill="white"/>
+        <circle cx="125" cy="106" r="9" fill="#F5C518"/>
+        <circle cx="125" cy="106" r="4" fill="#2A1040"/>
+        <rect x="111" y="91" width="28" height="10" fill="#9B59B6"/>
+      </svg>
+      Receipts
+    </div>
+    <div class="footer-tagline">Because your memory isn't the problem.</div>
+  </div>
+  <div class="footer-right">Made by Softbite Studio · 2025</div>
+</footer>
+
+</body>
+</html>
