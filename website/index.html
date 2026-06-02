@@ -1,589 +1,1339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Receipts — Because your memory isn't the problem. The app that documents what actually happened.">
-  <title>Receipts — Because your memory isn't the problem</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RECEIPTS 🧾</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,500;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --paper: #f5f0e8;
+    --hot: #ff2d6b;
+    --acid: #c8ff00;
+    --muted: #2a2a2a;
+    --ghost: #1a1a1a;
+    --border: #333;
+    --tag-bg: #1e1e1e;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --purple: #8B5CF6;
-      --purple-dark: #6D28D9;
-      --purple-light: #EDE9FE;
-      --pink: #EC4899;
-      --ink: #1A0A2E;
-      --surface: #F5EEFF;
-    }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
 
-    html { scroll-behavior: smooth; }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
 
-    body {
-      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-      background: var(--surface);
-      color: var(--ink);
-      overflow-x: hidden;
-    }
+  /* Header */
+  .header {
+    padding: 20px 20px 0;
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 2px;
+    color: var(--paper);
+    line-height: 1;
+  }
+  .logo span { color: var(--hot); }
+  .logo-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #555;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .streak-badge {
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--acid);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
-    /* ── Nav ─────────────────────────────────────────────────────────────────── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 40px;
-      background: rgba(245, 238, 255, 0.88);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(139, 92, 246, 0.10);
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none;
-    }
-    .nav-cta {
-      background: var(--pink); color: white; border: none;
-      padding: 10px 22px; border-radius: 12px;
-      font-family: inherit; font-weight: 600; font-size: 14px;
-      cursor: pointer; text-decoration: none;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(236,72,153,.38); }
+  /* Nav tabs */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: #666;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .nav-tab.active {
+    background: var(--hot);
+    color: var(--paper);
+    border-color: var(--hot);
+  }
 
-    /* ── Hero ────────────────────────────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      background: var(--ink);
-      display: grid; grid-template-columns: 1fr 1fr;
-      align-items: center;
-      padding: 112px 72px 80px; gap: 48px;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute;
-      top: -30%; right: -15%; width: 560px; height: 560px;
-      background: radial-gradient(circle, rgba(139,92,246,.22) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero::after {
-      content: ''; position: absolute;
-      bottom: -20%; left: -10%; width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(236,72,153,.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(139,92,246,.14); border: 1px solid rgba(139,92,246,.28);
-      border-radius: 100px; padding: 6px 16px;
-      font-size: 13px; font-weight: 500; color: #C4B5FD;
-      margin-bottom: 24px;
-    }
-    .hero h1 {
-      font-size: clamp(36px, 5.5vw, 68px); font-weight: 800;
-      line-height: 1.07; color: white; margin-bottom: 22px;
-    }
-    .hero h1 .pink { color: var(--pink); }
-    .hero h1 .lavender { color: #C4B5FD; }
-    .hero-sub {
-      font-size: 18px; line-height: 1.65;
-      color: rgba(255,255,255,.62); margin-bottom: 36px; max-width: 480px;
-    }
-    .hero-cta {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: var(--pink); color: white; border: none;
-      padding: 16px 30px; border-radius: 16px;
-      font-family: inherit; font-weight: 700; font-size: 16px;
-      cursor: pointer; text-decoration: none;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(236,72,153,.45); }
-    .hero-tagline { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,.35); font-style: italic; }
-    .hero-visual { display: flex; justify-content: center; align-items: center; }
-    .misty-hero {
-      animation: float 4s ease-in-out infinite;
-      filter: drop-shadow(0 24px 48px rgba(139,92,246,.45));
-    }
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+  /* Main content */
+  .main { padding: 16px 20px 100px; }
 
-    /* ── Scroll strip ────────────────────────────────────────────────────────── */
-    .strip { background: var(--purple); padding: 16px 0; overflow: hidden; }
-    .strip-track {
-      display: flex; gap: 0;
-      animation: marquee 28s linear infinite;
-      width: max-content;
-    }
-    .strip-item {
-      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-      font-size: 14px; font-weight: 600; color: white;
-      padding: 0 40px;
-    }
-    .strip-item::after { content: '·'; margin-left: 40px; opacity: .5; }
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  /* Drop a Receipt form */
+  .drop-section {
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .drop-section::before {
+    content: 'DROP A RECEIPT';
+    position: absolute;
+    top: -2px;
+    right: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    color: var(--hot);
+    background: var(--ghost);
+    padding: 0 6px;
+  }
+  .drop-prompt {
+    font-size: 0.8rem;
+    color: #666;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+  .drop-textarea {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    resize: none;
+    min-height: 90px;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .drop-textarea:focus { border-color: var(--hot); }
+  .drop-textarea::placeholder { color: #3a3a3a; }
 
-    /* ── Section shared ──────────────────────────────────────────────────────── */
-    .section-label {
-      display: inline-block; background: var(--purple); color: white;
-      font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      padding: 4px 12px; border-radius: 100px; margin-bottom: 14px;
-    }
-    .section-title {
-      font-size: clamp(28px, 4vw, 46px); font-weight: 800;
-      line-height: 1.12; margin-bottom: 14px;
-    }
-    .section-sub {
-      font-size: 17px; color: rgba(26,10,46,.58);
-      line-height: 1.65; max-width: 520px; margin-bottom: 56px;
-    }
+  /* Mood tags */
+  .mood-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 12px 0 8px;
+  }
+  .mood-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .mood-tag {
+    background: var(--tag-bg);
+    border: 1.5px solid #333;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .mood-tag span.label {
+    font-size: 0.65rem;
+    color: #666;
+    font-family: 'Space Mono', monospace;
+  }
+  .mood-tag.selected {
+    border-color: var(--hot);
+    background: rgba(255, 45, 107, 0.12);
+    color: var(--paper);
+  }
+  .mood-tag.selected span.label { color: var(--hot); }
 
-    /* ── Features ────────────────────────────────────────────────────────────── */
-    .features { padding: 96px 72px; background: var(--purple-light); }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px;
-    }
-    .feature-card {
-      background: white; border-radius: 24px; padding: 28px;
-      box-shadow: 0 2px 12px rgba(139,92,246,.07);
-      transition: transform .25s, box-shadow .25s;
-    }
-    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(139,92,246,.14); }
-    .feature-icon {
-      width: 52px; height: 52px; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 26px; margin-bottom: 18px;
-    }
-    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .feature-card p { font-size: 15px; line-height: 1.65; color: rgba(26,10,46,.62); }
+  /* Submit row */
+  .submit-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .btn-roast {
+    flex: 1;
+    background: var(--hot);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-roast:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-roast:active { transform: translateY(0); }
+  .btn-roast:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-tripping {
+    background: transparent;
+    border: 1.5px solid var(--acid);
+    color: var(--acid);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-tripping:hover { background: rgba(200,255,0,0.08); }
 
-    /* ── How it works ────────────────────────────────────────────────────────── */
-    .how { padding: 96px 72px; background: white; }
-    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; margin-top: 56px; position: relative; }
-    .steps::before {
-      content: ''; position: absolute;
-      top: 36px; left: 17%; right: 17%; height: 2px;
-      background: linear-gradient(90deg, var(--purple), var(--pink));
-    }
-    .step { text-align: center; position: relative; }
-    .step-num {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: var(--ink); color: white;
-      font-size: 22px; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 22px;
-      box-shadow: 0 0 0 5px var(--surface), 0 0 0 9px var(--purple);
-    }
-    .step h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-    .step p { font-size: 15px; color: rgba(26,10,46,.60); line-height: 1.65; }
+  /* Inline reality check */
+  .inline-reality {
+    display: none;
+    margin-top: 16px;
+    padding: 14px;
+    background: rgba(200,255,0,0.04);
+    border: 1px solid rgba(200,255,0,0.18);
+    border-radius: 10px;
+  }
 
-    /* ── Archetypes ──────────────────────────────────────────────────────────── */
-    .archetypes { padding: 96px 72px; background: var(--ink); }
-    .archetypes .section-title { color: white; }
-    .archetypes .section-sub { color: rgba(255,255,255,.52); }
-    .archetype-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-    .archetype-card {
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-      border-radius: 22px; overflow: hidden;
-      transition: transform .25s, background .25s;
-    }
-    .archetype-card:hover { transform: translateY(-4px); background: rgba(255,255,255,.08); }
-    .archetype-header {
-      padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .archetype-name-group { display: flex; align-items: center; gap: 10px; }
-    .archetype-emoji { font-size: 26px; line-height: 1; }
-    .archetype-name { font-size: 15px; font-weight: 700; color: white; }
-    .archetype-tagline { font-size: 12px; color: rgba(255,255,255,.48); font-style: italic; margin-top: 2px; }
-    .level-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 100px; flex-shrink: 0; margin-top: 2px; }
-    .level-1 { background: rgba(16,185,129,.15); color: #34D399; }
-    .level-2 { background: rgba(245,158,11,.15); color: #FCD34D; }
-    .level-3 { background: rgba(239,68,68,.15); color: #FCA5A5; }
-    .level-4 { background: rgba(139,92,246,.20); color: #C4B5FD; }
-    .archetype-body { padding: 16px 20px; }
-    .archetype-desc { font-size: 14px; line-height: 1.65; color: rgba(255,255,255,.60); margin-bottom: 14px; }
-    .archetype-antidote {
-      background: rgba(139,92,246,.14); border-radius: 10px; padding: 12px 14px;
-      font-size: 13px; line-height: 1.55; color: #C4B5FD;
-    }
-    .archetype-antidote strong { color: #DDD6FE; display: block; margin-bottom: 3px; }
-    .archetypes-unlock {
-      text-align: center; margin-top: 40px;
-      font-size: 14px; color: rgba(255,255,255,.38); font-style: italic;
-    }
+  /* Receipt card */
+  .receipt-card {
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .receipt-top { padding: 14px 16px; }
+  .receipt-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .receipt-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--hot);
+    letter-spacing: 1px;
+  }
+  .receipt-mood { display: flex; align-items: center; gap: 8px; }
+  .mood-pill {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mood-pill .mlabel {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #666;
+  }
+  .receipt-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #444;
+  }
+  .receipt-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #ccc;
+  }
 
-    /* ── Quotes ──────────────────────────────────────────────────────────────── */
-    .quotes { padding: 96px 72px; background: var(--surface); }
-    .quotes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; margin-top: 56px; }
-    .quote-card { background: white; border-radius: 22px; padding: 28px; box-shadow: 0 2px 10px rgba(139,92,246,.06); }
-    .stars { color: #F59E0B; font-size: 15px; margin-bottom: 14px; }
-    .quote-text { font-size: 16px; line-height: 1.7; color: var(--ink); margin-bottom: 22px; font-style: italic; }
-    .quote-author { display: flex; align-items: center; gap: 12px; }
-    .quote-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-    .quote-name { font-size: 14px; font-weight: 700; color: var(--ink); }
-    .quote-handle { font-size: 13px; color: rgba(26,10,46,.45); }
+  /* Roast response */
+  .roast-section {
+    border-top: 1px dashed #2a2a2a;
+    padding: 14px 16px;
+    background: rgba(255,45,107,0.04);
+  }
+  .roast-header {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--hot);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .roast-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,45,107,0.2);
+  }
+  .roast-text {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: #e0d8cc;
+    font-style: italic;
+  }
+  .roast-diagnosis {
+    display: inline-block;
+    background: rgba(255,45,107,0.15);
+    border: 1px solid rgba(255,45,107,0.3);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--hot);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
 
-    /* ── CTA ─────────────────────────────────────────────────────────────────── */
-    .cta-section {
-      padding: 100px 72px; background: var(--purple);
-      text-align: center; position: relative; overflow: hidden;
-    }
-    .cta-section::before {
-      content: ''; position: absolute;
-      top: -40%; left: -10%; width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(255,255,255,.10) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .cta-misty { margin: 0 auto 32px; display: block; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 16px 32px rgba(0,0,0,.3)); }
-    .cta-section h2 { font-size: clamp(30px, 4vw, 52px); font-weight: 800; color: white; line-height: 1.12; margin-bottom: 14px; }
-    .cta-section p { font-size: 18px; color: rgba(255,255,255,.72); margin-bottom: 40px; }
-    .cta-btn {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: white; color: var(--purple-dark); border: none;
-      padding: 18px 38px; border-radius: 18px;
-      font-family: inherit; font-weight: 700; font-size: 17px;
-      cursor: pointer; text-decoration: none;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.22); }
+  /* Reality check */
+  .reality-section {
+    border-top: 1px dashed #2a2a2a;
+    padding: 12px 16px;
+    background: rgba(200,255,0,0.03);
+  }
+  .reality-header {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--acid);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .reality-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(200,255,0,0.15);
+  }
+  .reality-text {
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: #aaa;
+  }
+  .reality-verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    background: rgba(200,255,0,0.1);
+    border: 1px solid rgba(200,255,0,0.25);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--acid);
+  }
 
-    /* ── Footer ──────────────────────────────────────────────────────────────── */
-    footer {
-      background: var(--ink); padding: 48px 72px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .footer-left { display: flex; flex-direction: column; gap: 4px; }
-    .footer-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: white; }
-    .footer-tagline { font-size: 13px; color: rgba(255,255,255,.38); font-style: italic; }
-    .footer-right { font-size: 13px; color: rgba(255,255,255,.28); }
+  /* Card actions */
+  .card-actions {
+    border-top: 1px solid #222;
+    padding: 8px 16px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .card-btn {
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .card-btn:hover { border-color: #555; color: #888; }
+  .card-btn-delete:hover { border-color: var(--hot); color: var(--hot); }
 
-    /* ── Responsive ──────────────────────────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; padding: 100px 28px 64px; text-align: center; }
-      .hero-visual { order: -1; }
-      .hero-sub { max-width: 100%; margin: 0 auto 36px; }
-      .features, .how, .archetypes, .quotes, .cta-section { padding: 72px 24px; }
-      .steps { grid-template-columns: 1fr; }
-      .steps::before { display: none; }
-      .quotes-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 16px; text-align: center; padding: 40px 24px; }
-      nav { padding: 14px 20px; }
-    }
-  </style>
+  /* Loading shimmer */
+  .loading-roast {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-top: 1px dashed #2a2a2a;
+    color: #555;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+  }
+  .dot-loader { display: flex; gap: 4px; }
+  .dot-loader span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--hot);
+    animation: blink 1.2s infinite;
+  }
+  .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
+  .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
+
+  /* Pattern alert */
+  .pattern-alert {
+    background: linear-gradient(135deg, #1a0a1a, #0a0a1a);
+    border: 1px solid rgba(255,45,107,0.4);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.4s ease;
+  }
+  .pattern-alert::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(255,45,107,0.08), transparent 60%);
+  }
+  .pattern-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--hot);
+    color: white;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .pattern-archetype {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    color: var(--paper);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .pattern-quote {
+    font-size: 0.82rem;
+    color: #888;
+    font-style: italic;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .pattern-desc {
+    font-size: 0.82rem;
+    color: #aaa;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .counter-archetype {
+    margin-top: 14px;
+    padding: 12px;
+    background: rgba(200,255,0,0.06);
+    border: 1px solid rgba(200,255,0,0.2);
+    border-radius: 10px;
+  }
+  .counter-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--acid);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .counter-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--acid);
+    margin-bottom: 4px;
+  }
+  .counter-desc {
+    font-size: 0.78rem;
+    color: #888;
+    line-height: 1.5;
+  }
+  .pattern-more {
+    margin-top: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #555;
+    letter-spacing: 1px;
+  }
+
+  /* Phase roadmap section */
+  .phase-section { margin-bottom: 20px; }
+  .phase-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: var(--paper);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .phase-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .phase-card {
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .phase-card.active-phase { border-color: var(--hot); }
+  .phase-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--hot);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .phase-num.future { color: #444; }
+  .phase-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .phase-desc {
+    font-size: 0.8rem;
+    color: #777;
+    line-height: 1.55;
+  }
+  .phase-features {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .phase-feat {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.65rem;
+    color: #888;
+    font-family: 'Space Mono', monospace;
+  }
+  .phase-card.active-phase .phase-feat {
+    border-color: rgba(255,45,107,0.3);
+    color: #bbb;
+  }
+
+  /* Archetypes gallery */
+  .archetype-level {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: #555;
+    text-transform: uppercase;
+    margin: 16px 0 8px;
+  }
+  .archetype-item {
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 8px;
+  }
+  .archetype-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--paper);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .archetype-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--hot);
+    border: 1px solid rgba(255,45,107,0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .archetype-quote {
+    font-size: 0.78rem;
+    color: #777;
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .archetype-advice-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .advice-arrow {
+    color: var(--acid);
+    font-size: 0.8rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .archetype-advice-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--acid);
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+  }
+  .archetype-advice-text {
+    font-size: 0.78rem;
+    color: #aaa;
+    line-height: 1.5;
+  }
+
+  /* Progress bar */
+  .progress-container {
+    margin-bottom: 16px;
+    background: var(--ghost);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  .progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #555;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-label em { color: var(--acid); font-style: normal; }
+  .progress-bar {
+    height: 3px;
+    background: #222;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--hot), var(--acid));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #333;
+  }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: #3a3a3a;
+    margin-bottom: 6px;
+  }
+  .empty-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #2a2a2a;
+    line-height: 1.6;
+  }
+
+  /* Log count */
+  .log-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #444;
+    text-align: center;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .log-count em { color: var(--hot); font-style: normal; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 200;
+  }
+  .bnav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px 14px;
+    cursor: pointer;
+    gap: 4px;
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    color: #444;
+  }
+  .bnav-item.active { color: var(--hot); }
+  .bnav-icon { font-size: 1.2rem; }
+  .bnav-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--hot);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Sections */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .api-error {
+    background: rgba(255,45,107,0.08);
+    border: 1px solid rgba(255,45,107,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #888;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+</style>
 </head>
 <body>
 
-<!-- ── Nav ──────────────────────────────────────────────────────────────────── -->
-<nav>
-  <a href="#" class="nav-logo">
-    <svg width="34" height="34" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
-      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="#9B59B6"/>
-      <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="#E8A0F0"/>
-      <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
-      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
-      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="#9B59B6"/>
-      <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="#E8A0F0"/>
-      <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
-      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
-      <ellipse cx="100" cy="116" rx="72" ry="60" fill="#9B59B6"/>
-      <ellipse cx="100" cy="61" rx="20" ry="8" fill="#BB77D4"/>
-      <circle cx="57" cy="129" r="20" fill="#E879F9" opacity=".22"/>
-      <circle cx="143" cy="129" r="20" fill="#E879F9" opacity=".22"/>
-      <circle cx="75" cy="105" r="18" fill="white"/>
-      <circle cx="75" cy="106" r="13" fill="#F5C518"/>
-      <circle cx="75" cy="106" r="9" fill="#D4AC0D"/>
-      <circle cx="75" cy="106" r="5" fill="#2A1040"/>
-      <circle cx="71" cy="102" r="3" fill="white"/>
-      <rect x="56" y="87" width="38" height="13" fill="#9B59B6"/>
-      <circle cx="125" cy="105" r="18" fill="white"/>
-      <circle cx="125" cy="106" r="13" fill="#F5C518"/>
-      <circle cx="125" cy="106" r="9" fill="#D4AC0D"/>
-      <circle cx="125" cy="106" r="5" fill="#2A1040"/>
-      <circle cx="121" cy="102" r="3" fill="white"/>
-      <rect x="106" y="87" width="38" height="13" fill="#9B59B6"/>
-      <polygon points="100,130 93,125 107,125" fill="#FFAFCC"/>
-      <line x1="100" y1="130" x2="100" y2="136" stroke="#2A1040" stroke-width="1" stroke-opacity=".22"/>
-      <path d="M87,138 C96,143 108,142 115,137" fill="none" stroke="#2A1040" stroke-width="2.2" stroke-opacity=".55" stroke-linecap="round"/>
-      <ellipse cx="100" cy="116" rx="72" ry="60" fill="none" stroke="#2A1040" stroke-width="1.5" stroke-opacity=".25"/>
-    </svg>
-    Receipts
-  </a>
-  <a href="#download" class="nav-cta">Get the App</a>
-</nav>
-
-<!-- ── Hero ─────────────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <div>
-    <div class="hero-badge">🧾 Now available on Android</div>
-    <h1>Your memory was <span class="pink">never</span> the <span class="lavender">problem.</span></h1>
-    <p class="hero-sub">Receipts is the app that documents what actually happened — with satirical validation from Misty, your pastel goth bunny archivist who believes you and has the logs to prove it.</p>
-    <a href="#download" class="hero-cta">📲 Drop a Receipt</a>
-    <p class="hero-tagline">"Because your memory isn't the problem."</p>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="logo">RECEIPT<span>S</span> 🧾</div>
+      <div class="logo-sub">EVIDENCE-BASED EMOTIONAL CLARITY</div>
+    </div>
+    <div class="streak-badge" id="streakBadge">🔥 <span id="logCountBadge">0</span> logs</div>
   </div>
-  <div class="hero-visual">
-    <svg class="misty-hero" width="320" height="320" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
-      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="#9B59B6"/>
-      <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="#E8A0F0"/>
-      <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="none" stroke="#2A1040" stroke-width="1.2" stroke-opacity=".28"/>
-      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="#9B59B6"/>
-      <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="#E8A0F0"/>
-      <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="none" stroke="#2A1040" stroke-width="1.2" stroke-opacity=".28"/>
-      <ellipse cx="100" cy="116" rx="72" ry="60" fill="#9B59B6"/>
-      <ellipse cx="100" cy="61" rx="20" ry="8" fill="#BB77D4"/>
-      <circle cx="57" cy="129" r="20" fill="#E879F9" opacity=".22"/>
-      <circle cx="143" cy="129" r="20" fill="#E879F9" opacity=".22"/>
-      <circle cx="75" cy="105" r="18" fill="white"/>
-      <circle cx="75" cy="106" r="13" fill="#F5C518"/>
-      <circle cx="75" cy="106" r="9" fill="#D4AC0D"/>
-      <circle cx="75" cy="106" r="5" fill="#2A1040"/>
-      <circle cx="71" cy="102" r="3" fill="white"/>
-      <rect x="56" y="87" width="38" height="13" fill="#9B59B6"/>
-      <line x1="57" y1="122" x2="93" y2="122" stroke="#2A1040" stroke-width="1.1" stroke-opacity=".45" stroke-linecap="round"/>
-      <line x1="91" y1="118" x2="100" y2="110" stroke="#2A1040" stroke-width="1" stroke-opacity=".4" stroke-linecap="round"/>
-      <circle cx="125" cy="105" r="18" fill="white"/>
-      <circle cx="125" cy="106" r="13" fill="#F5C518"/>
-      <circle cx="125" cy="106" r="9" fill="#D4AC0D"/>
-      <circle cx="125" cy="106" r="5" fill="#2A1040"/>
-      <circle cx="121" cy="102" r="3" fill="white"/>
-      <rect x="106" y="87" width="38" height="13" fill="#9B59B6"/>
-      <line x1="107" y1="122" x2="143" y2="122" stroke="#2A1040" stroke-width="1.1" stroke-opacity=".45" stroke-linecap="round"/>
-      <line x1="141" y1="118" x2="150" y2="110" stroke="#2A1040" stroke-width="1" stroke-opacity=".4" stroke-linecap="round"/>
-      <polygon points="100,130 93,125 107,125" fill="#FFAFCC"/>
-      <line x1="100" y1="130" x2="100" y2="136" stroke="#2A1040" stroke-width="1" stroke-opacity=".2"/>
-      <path d="M87,138 C96,143 108,142 115,137" fill="none" stroke="#2A1040" stroke-width="2.4" stroke-opacity=".55" stroke-linecap="round"/>
-      <ellipse cx="100" cy="116" rx="72" ry="60" fill="none" stroke="#2A1040" stroke-width="1.4" stroke-opacity=".24"/>
-    </svg>
-  </div>
-</section>
-
-<!-- ── Scroll strip ───────────────────────────────────────────────────────────── -->
-<div class="strip" aria-hidden="true">
-  <div class="strip-track">
-    <span class="strip-item">🧾 Document what actually happened</span>
-    <span class="strip-item">🤖 Misty's verdict is in</span>
-    <span class="strip-item">🚩 Pattern detected</span>
-    <span class="strip-item">💜 You are not tripping</span>
-    <span class="strip-item">📋 Screenshot-ready receipts</span>
-    <span class="strip-item">🧾 Document what actually happened</span>
-    <span class="strip-item">🤖 Misty's verdict is in</span>
-    <span class="strip-item">🚩 Pattern detected</span>
-    <span class="strip-item">💜 You are not tripping</span>
-    <span class="strip-item">📋 Screenshot-ready receipts</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('drop', this)">🧾 Drop</button>
+    <button class="nav-tab" onclick="switchView('feed', this)">📜 Feed</button>
+    <button class="nav-tab" onclick="switchView('archetypes', this)">🗂️ Field Guide</button>
+    <button class="nav-tab" onclick="switchView('phases', this)">🚀 Roadmap</button>
   </div>
 </div>
 
-<!-- ── Features ──────────────────────────────────────────────────────────────── -->
-<section class="features" id="features">
-  <span class="section-label">What it does</span>
-  <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
-  <p class="section-sub">Four tools for the person who keeps explaining themselves and wondering why it never lands.</p>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon" style="background:#EDE9FE">🧾</div>
-      <h3>Drop a Receipt</h3>
-      <p>Write what happened. Tag how you're feeling. File it before you talk yourself out of it or start second-guessing the timeline.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:#FCE7F3">🤖</div>
-      <h3>Auto-Roast</h3>
-      <p>Misty reads your receipt and responds with a diagnosis, a roast, and a reality check. Satirical. Accurate. Slightly savage.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:#FEF3C7">🤔</div>
-      <h3>Am I Tripping?</h3>
-      <p>Tap the button. Get a reality check. Misty confirms: your feelings are valid, your pattern recognition is working, and no, you are not tripping.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon" style="background:#ECFDF5">📊</div>
-      <h3>Pattern Report</h3>
-      <p>After 10 receipts, Misty identifies behavioral archetypes across your logs. The Deflector. The Alternate Reality Architect. The Moving Goalpost. Named and filed.</p>
+<div class="main">
+
+  <!-- DROP VIEW -->
+  <div class="view active" id="view-drop">
+    <div id="patternAlertContainer"></div>
+    <div class="drop-section">
+      <div class="drop-prompt">// spill it. no judgment. just facts.</div>
+      <textarea class="drop-textarea" id="dropInput" placeholder="he said he 'forgot' we had plans but liked her instagram 40 minutes later..."></textarea>
+      <div class="mood-label">// MANDATORY MOOD TAG</div>
+      <div class="mood-tags">
+        <div class="mood-tag" onclick="selectMood(this,'😒','dead')">😒 <span class="label">DEAD</span></div>
+        <div class="mood-tag" onclick="selectMood(this,'😤','heated')">😤 <span class="label">HEATED</span></div>
+        <div class="mood-tag" onclick="selectMood(this,'🤡','clowned')">🤡 <span class="label">CLOWNED</span></div>
+        <div class="mood-tag" onclick="selectMood(this,'💀','cooked')">💀 <span class="label">COOKED</span></div>
+        <div class="mood-tag" onclick="selectMood(this,'🫠','melting')">🫠 <span class="label">MELTING</span></div>
+        <div class="mood-tag" onclick="selectMood(this,'😶‍🌫️','zoned')">😶‍🌫️ <span class="label">ZONED</span></div>
+      </div>
+      <div class="submit-row">
+        <button class="btn-roast" id="roastBtn" onclick="submitReceipt()">🔥 GET ROASTED</button>
+        <button class="btn-tripping" onclick="amITripping()">🔍 AM I TRIPPING?</button>
+      </div>
+      <div class="inline-reality" id="inlineReality">
+        <div class="reality-header">// AM I TRIPPING?</div>
+        <div class="reality-text" id="inlineRealityText"></div>
+        <div class="reality-verdict">✓ NOT TRIPPING</div>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- ── How it works ───────────────────────────────────────────────────────────── -->
-<section class="how" id="how">
-  <span class="section-label">How it works</span>
-  <h2 class="section-title">Three steps.<br>Zero gaslight.</h2>
-  <p class="section-sub">From "did that actually happen" to "Misty has confirmed it happened" in under a minute.</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <h3>Drop a Receipt</h3>
-      <p>Write what happened. Tag the vibe — 😒😤🤡💀🙄😭⚡🚩. Don't soften it.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <h3>Misty Reviews</h3>
-      <p>She reads the receipt, issues a diagnosis, and provides a roast with clinical precision. No one asked. She did it anyway.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <h3>The Pattern Emerges</h3>
-      <p>Log enough receipts and the behavioral archetype surfaces. Named, described, and shipped with an antidote.</p>
+  <!-- FEED VIEW -->
+  <div class="view" id="view-feed">
+    <div id="logCountDisplay" class="log-count"></div>
+    <div id="progressContainer"></div>
+    <div id="feedContainer">
+      <div class="empty-state">
+        <div class="empty-icon">🧾</div>
+        <div class="empty-title">NO RECEIPTS YET</div>
+        <div class="empty-sub">drop your first tea<br>and get your roast</div>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- ── Archetypes ─────────────────────────────────────────────────────────────── -->
-<section class="archetypes" id="archetypes">
-  <span class="section-label" style="background:rgba(139,92,246,.3);color:#C4B5FD">Behavioral Archetypes</span>
-  <h2 class="section-title">Misty has done the research.</h2>
-  <p class="section-sub">10 archetypes. 4 severity levels. Each one named, described, and shipped with an antidote. Unlock them after 10 receipts.</p>
-  <div class="archetype-grid">
-    <div class="archetype-card">
-      <div class="archetype-header">
-        <div class="archetype-name-group">
-          <span class="archetype-emoji">🌀</span>
+  <!-- ARCHETYPES VIEW -->
+  <div class="view" id="view-archetypes">
+    <div class="archetype-grid" id="archetypeGrid"></div>
+  </div>
+
+  <!-- PHASES VIEW -->
+  <div class="view" id="view-phases">
+    <div class="phase-section">
+      <div class="phase-header">ROADMAP</div>
+
+      <div class="phase-card active-phase">
+        <div class="phase-num">// PHASE 01 — ACTIVE</div>
+        <div class="phase-title">VIRAL TRACTION</div>
+        <div class="phase-desc">Free forever. Built to spread. Drop receipts, get roasted, share the chaos. Every post is a referral.</div>
+        <div class="phase-features">
+          <div class="phase-feat">Receipt Logging</div>
+          <div class="phase-feat">AI Roasts</div>
+          <div class="phase-feat">Reality Checks</div>
+          <div class="phase-feat">Archetype Detection</div>
+          <div class="phase-feat">Clipboard Export</div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num future">// PHASE 02 — COMING</div>
+        <div class="phase-title">DEPTH & SIGNAL</div>
+        <div class="phase-desc">Pattern analysis gets smarter. Timeline view. Trend charts. Export your receipts as a PDF dossier. Because some situations need documentation.</div>
+        <div class="phase-features">
+          <div class="phase-feat">Pattern Timeline</div>
+          <div class="phase-feat">Mood Heatmap</div>
+          <div class="phase-feat">PDF Export</div>
+          <div class="phase-feat">Receipt Search</div>
+          <div class="phase-feat">Custom Tags</div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num future">// PHASE 03 — PLANNED</div>
+        <div class="phase-title">MISTY PRO</div>
+        <div class="phase-desc">Optional subscription. Upgraded AI responses, conversation coaching mode, relationship health scoring, and the full archetype report with intervention guides.</div>
+        <div class="phase-features">
+          <div class="phase-feat">AI Coaching Mode</div>
+          <div class="phase-feat">Health Score</div>
+          <div class="phase-feat">Intervention Guides</div>
+          <div class="phase-feat">Voice Input</div>
+          <div class="phase-feat">iCloud Sync</div>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num future">// PHASE 04 — VISION</div>
+        <div class="phase-title">THE PLATFORM</div>
+        <div class="phase-desc">Anonymous community receipts. Therapist integrations. API for researchers. The receipts database becomes evidence for something larger.</div>
+        <div class="phase-features">
+          <div class="phase-feat">Community Feed</div>
+          <div class="phase-feat">Therapist Mode</div>
+          <div class="phase-feat">Research API</div>
+          <div class="phase-feat">Anonymized Insights</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <button class="bnav-item active" id="bnav-drop" onclick="switchView('drop', null, this)">
+    <span class="bnav-icon">🧾</span>
+    <span class="bnav-label">Drop</span>
+  </button>
+  <button class="bnav-item" id="bnav-feed" onclick="switchView('feed', null, this)">
+    <span class="bnav-icon">📜</span>
+    <span class="bnav-label">Feed</span>
+  </button>
+  <button class="bnav-item" id="bnav-archetypes" onclick="switchView('archetypes', null, this)">
+    <span class="bnav-icon">🗂️</span>
+    <span class="bnav-label">Guide</span>
+  </button>
+  <button class="bnav-item" id="bnav-phases" onclick="switchView('phases', null, this)">
+    <span class="bnav-icon">🚀</span>
+    <span class="bnav-label">Road</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let receipts = [];
+try { receipts = JSON.parse(localStorage.getItem('rcp_v1') || '[]'); } catch(e) {}
+let activeMood = null;
+
+function save() { localStorage.setItem('rcp_v1', JSON.stringify(receipts)); }
+
+// ─── ROAST ENGINE ────────────────────────────────────────────────────────────
+function strHas(text) {
+  return function(...kws) { return kws.some(k => text.toLowerCase().includes(k.toLowerCase())); };
+}
+
+const ROASTS = {
+  heated: [
+    "Fuming is the correct response. Absolutely the correct response. Let the record show.",
+    "Your frustration is data, not a flaw. Something crossed a line. You noticed. That's called perception.",
+    "The steam is visible from space. The restraint you've shown is frankly impressive.",
+    "You're not overreacting. The situation is under-respecting your patience."
+  ],
+  clowned: [
+    "The clown makeup was applied without your consent. Highly recommend removal.",
+    "At least real clowns get paid. You've been freelancing in this circus for free.",
+    "You've been doing the emotional labor AND providing the entertainment. The clown car has left.",
+    "Starring in your own circus without charging admission. That ends now."
+  ],
+  cooked: [
+    "Deceased. Gone. Left the chat. And yet somehow still expected to show up.",
+    "The spirit has left the body but the obligations remain. Peak modern experience.",
+    "Dead inside, alive outside, still expected to be pleasant about it. Impressive.",
+    "Wellness check filed. Status: done. Completely and utterly done."
+  ],
+  dead: [
+    "Dry. Flat. Checked out. The correct response to a situation that stopped earning your energy.",
+    "The energy you're not spending on this? That's not apathy. That's a budget decision.",
+    "Side-eye deployed. Pattern recognized. The file has been updated. The file is thick.",
+    "Your face says it all. Specifically: 'I am no longer available for this.'"
+  ],
+  melting: [
+    "Crying about this is a completely proportionate response. The situation earned those tears.",
+    "You've been so strong for so long. This is just deferred feelings arriving with interest.",
+    "The tears are valid evidence. They are accepted as primary source documentation.",
+    "Something crossed a threshold. The threshold was a reasonable one."
+  ],
+  zoned: [
+    "Dissociation as a coping mechanism: efficient short-term, concerning long-term.",
+    "The brain has logged out of this situation. The body is still here paying rent.",
+    "Somewhere else entirely. Cannot blame you. Honestly? Smart.",
+    "Checked out of the conversation and into the ceiling. A reasonable place to be."
+  ]
+};
+
+const DIAGNOSES = {
+  heated: "Righteous Indignation Overload™",
+  clowned: "Involuntary Clownery Exposure™",
+  cooked: "Emotional Fatality Syndrome™",
+  dead: "Pattern Recognition Hyperactivity™",
+  melting: "Deferred Feelings With Interest™",
+  zoned: "Tactical Dissociation Syndrome™"
+};
+
+const REALITY_CHECKS = {
+  heated: "Your anger is data, not a flaw. Something happened that crossed a line. You noticed. That's not overreacting — that's self-awareness working correctly.",
+  clowned: "You're not the clown. You're the one watching the circus without having signed up for a ticket. Your expectations of basic human cooperation are completely valid.",
+  cooked: "Exhaustion from carrying an unfair load is valid. You didn't sign up to be everyone's support system while running on empty. This is not dramatic. This is tired.",
+  dead: "The side-eye was warranted. Your suspicion has logical roots. You're not paranoid — you're pattern-matching from experience, which is a feature not a bug.",
+  melting: "Crying about this is a completely proportionate response. The situation earned those tears. You don't need to apologize for having feelings about something that affected you.",
+  zoned: "Checking out is sometimes the only reasonable response to an unreasonable situation. Your nervous system is doing what it needs to do. This is not weakness. This is survival."
+};
+
+function buildRoast(text, mood) {
+  const has = strHas(text);
+  if (has('forgot','forget',"doesn't remember","can't remember"))
+    return "The Selective Memory Download is running. Funny how it only glitches for things that require effort.";
+  if (has('gaming','controller','game','xbox','playstation','ps5','nintendo'))
+    return "Controller Paralysis: a rare condition where the thumbs work perfectly but the ears stop functioning entirely.";
+  if (has('dishes','cleaning','laundry','mess','tidied','vacuum'))
+    return "Domestic Blindness confirmed. The mess was visible. The inconvenience was not. Case filed.";
+  if (has('sorry but','apologize but','sorry, but'))
+    return "A 'sorry but' is just a criticism wearing a sorry costume. The costume is not convincing.";
+  if (has('crazy','paranoid','overreacting','too sensitive','dramatic','being dramatic'))
+    return "Someone called you crazy for having a valid reaction. Classic. The database has been updated.";
+  if (has('silent','silence','ignoring','left on read'))
+    return "Silence as punishment. One of the oldest tricks in the playbook. Vintage behavior. Recognized.";
+  if (has('never said',"didn't say that",'you assumed','i never'))
+    return "The 'I Never Technically Said That' defense. Very popular. Very exhausting. We are unimpressed.";
+  if (has('promised','said they would',"said they'd",'was supposed to'))
+    return "The promise was made. The promise has aged poorly. The promise is now a receipt.";
+  const pool = ROASTS[mood] || [
+    "Filed, dated, and notarized. The receipt has been received.",
+    "Another log for the archives. The archives are getting thick.",
+    "The behavior has been documented. The documentation is growing.",
+    "Reviewed. Acknowledged. Archived. You are not imagining things."
+  ];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function buildDiagnosis(text, mood) {
+  const has = strHas(text);
+  if (has('gaming','controller','game')) return "Controller Paralysis™";
+  if (has('forgot','forget','remember')) return "Selective Amnesia Syndrome™";
+  if (has('dishes','cleaning','mess','laundry')) return "Domestic Blindness Disorder™";
+  if (has('crazy','paranoid','overreacting','dramatic')) return "Weaponized Gaslight Exposure™";
+  if (has('silent','silence','ignoring','left on read')) return "Strategic Silence Deployment™";
+  if (has('sorry but','sorry, but','apologize but')) return "Conditional Apology Syndrome™";
+  if (has('promised','supposed to')) return "Chronic Promise Inflation™";
+  return DIAGNOSES[mood] || "General Unhinged Behavior Disorder™";
+}
+
+function buildRealityCheck(mood) {
+  return REALITY_CHECKS[mood] || "Your feelings are real. The situation happened. You are not making this up, and you are not overreacting. Confirmed: not tripping.";
+}
+
+// ─── ARCHETYPES ───────────────────────────────────────────────────────────────
+const ARCHETYPES = [
+  { id:'selective_amnesia', level:1, emoji:'🧠',
+    name:'THE SELECTIVE AMNESIA UNIT',
+    tagline:"Remembers your coffee order from 2019. Forgot the thing you said five minutes ago.",
+    desc:"Exhibits remarkably precise memory for unimportant details while consistently failing to retain anything that requires follow-through or accountability.",
+    antidoteName:'THE PAPER TRAIL',
+    antidote:"Try text-based confirmation for important things. You can't gaslight a screenshot." },
+  { id:'conditional_helper', level:1, emoji:'🤝',
+    name:'THE CONDITIONAL HELPER',
+    tagline:"Happy to help. Conditions apply. Fine print very long.",
+    desc:"Provides support exclusively when convenient, in a good mood, or when it creates an opportunity to be recognized for it later.",
+    antidoteName:'THE BASELINE CHECK',
+    antidote:"Notice when help is offered proactively vs. only when asked. The pattern tells the story." },
+  { id:'deflector', level:1, emoji:'🏓',
+    name:'THE DEFLECTOR',
+    tagline:"You: I feel hurt. Them: Well I feel hurt MORE.",
+    desc:"Every conversation about your feelings becomes a conversation about their feelings. Your concern gets returned to sender with extra postage.",
+    antidoteName:'THE PATTERN NAME',
+    antidote:"Name it out loud: 'I'm noticing we moved away from what I was saying.' Deflectors hate a mirror." },
+  { id:'emotional_accountant', level:2, emoji:'🧾',
+    name:'THE EMOTIONAL ACCOUNTANT',
+    tagline:"Keeping score since forever. Invoicing at the worst possible moment.",
+    desc:"Tracks every favor, every concession, every kind thing they've ever done. Presents the bill at the most strategic and destabilizing moments.",
+    antidoteName:'THE EQUITY AUDIT',
+    antidote:"Relationships aren't transactions. If the ledger is always unbalanced in their favor, that's not accounting — that's control." },
+  { id:'moving_goalpost', level:2, emoji:'🥅',
+    name:'THE MOVING GOALPOST',
+    tagline:"You meet the standard. The standard moves. Always.",
+    desc:"Whatever you do is never quite enough. Once you achieve what was asked, the criteria shift. Perfection is not the goal — your perpetual inadequacy is.",
+    antidoteName:'THE BOUNDARY SETTER',
+    antidote:"Stop running toward the goalpost. It will keep moving. Decide if you want to play this game." },
+  { id:'strategic_victim', level:2, emoji:'🎭',
+    name:'THE STRATEGIC VICTIM',
+    tagline:"Somehow always the most wronged person in the room.",
+    desc:"Whenever accountability approaches, they become the victim. Your valid concern becomes an attack they need to recover from.",
+    antidoteName:'THE REALITY ANCHOR',
+    antidote:"Hold the line: 'I hear you're upset. I still want to talk about what happened.'" },
+  { id:'reality_distorter', level:3, emoji:'🌀',
+    name:'THE REALITY DISTORTER',
+    tagline:"You were there. You saw it. Apparently neither of those things happened.",
+    desc:"Consistently rewrites events after the fact. Your clear memory of what happened is presented as confusion or misinterpretation.",
+    antidoteName:'THE RECEIPT KEEPER',
+    antidote:"Document. Document. Document. Your memory is accurate — and receipts don't lie." },
+  { id:'silence_deployer', level:3, emoji:'🔇',
+    name:'THE WEAPONIZED SILENCE EXPERT',
+    tagline:"The silent treatment, but make it tactical.",
+    desc:"Uses silence not to process, but to punish. The withdrawal is calibrated to create maximum anxiety and compliance.",
+    antidoteName:'THE SILENCE READER',
+    antidote:"Silence used as punishment is emotional coercion. You don't have to fill that silence or earn your way back." },
+  { id:'intensity_oscillator', level:3, emoji:'💣',
+    name:'THE INTENSITY OSCILLATOR',
+    tagline:"The highest highs. The lowest lows. Rinse. Repeat.",
+    desc:"Alternates between overwhelming affection and complete withdrawal. The unpredictability keeps you off-balance and attached.",
+    antidoteName:'THE CONSISTENCY CHECK',
+    antidote:"Consistency is the metric, not intensity. Ask: what does the average day look like, not the best or worst." },
+  { id:'alternate_reality', level:4, emoji:'🏗️',
+    name:'THE ALTERNATE REALITY ARCHITECT',
+    tagline:"They built a narrative where they're always right. You weren't invited to the blueprint meeting.",
+    desc:"Constructs an elaborate alternative version of events where their behavior is always justified and your perspective is always flawed. The alternate reality is load-bearing — it cannot be questioned.",
+    antidoteName:'THE EXTERNAL VALIDATOR',
+    antidote:"You cannot win an argument inside someone else's constructed reality. External support helps you keep your grip on what actually happened." }
+];
+
+// ─── ARCHETYPE DETECTION ─────────────────────────────────────────────────────
+function detectArchetypes(recs) {
+  if (recs.length < 5) return [];
+  const count = (...kws) => recs.filter(r => kws.some(k => r.text.toLowerCase().includes(k.toLowerCase()))).length;
+  const moodCount = (key) => recs.filter(r => r.mood === key).length;
+  const detected = new Set();
+  if (count('forgot','forget',"doesn't remember","can't remember") >= 2) detected.add('selective_amnesia');
+  if (count('only helps when','never helps',"won't help","didn't help") >= 2) detected.add('conditional_helper');
+  if (count('made it about','turned it around','back to them','about themselves') >= 2
+    || (moodCount('dead') >= 2 && moodCount('heated') >= 2)) detected.add('deflector');
+  if (count('keep score','reminded me','brought up again','you owe','never forget') >= 2) detected.add('emotional_accountant');
+  if (count('not enough','still not','never good enough','could have done better') >= 2) detected.add('moving_goalpost');
+  if (count('always the victim','made me feel bad','turned it on me') >= 2) detected.add('strategic_victim');
+  if (count('crazy','paranoid','imagining',"didn't happen",'never said') >= 2) detected.add('reality_distorter');
+  if (count('silent','silence','ignoring','stopped talking','left on read') >= 2) detected.add('silence_deployer');
+  if (moodCount('cooked') >= 3) detected.add('intensity_oscillator');
+  if (moodCount('heated') >= 4) detected.add('alternate_reality');
+  return ARCHETYPES.filter(a => detected.has(a.id)).sort((a,b) => b.level - a.level);
+}
+
+// ─── RENDERING ───────────────────────────────────────────────────────────────
+function timeAgo(ts) {
+  const d = Date.now() - ts;
+  const m = Math.floor(d / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderFeed() {
+  const container = document.getElementById('feedContainer');
+  const countEl = document.getElementById('logCountDisplay');
+  const progress = document.getElementById('progressContainer');
+  document.getElementById('logCountBadge').textContent = receipts.length;
+
+  if (receipts.length === 0) {
+    countEl.innerHTML = '';
+    progress.innerHTML = '';
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-title">NO RECEIPTS YET</div><div class="empty-sub">drop your first tea<br>and get your roast</div></div>`;
+    return;
+  }
+
+  const needed = 5;
+  const pct = Math.min(100, Math.round(receipts.length / needed * 100));
+  if (receipts.length < needed) {
+    progress.innerHTML = `<div class="progress-container"><div class="progress-label"><span>// PATTERN ANALYSIS</span><span><em>${receipts.length}/${needed}</em> receipts</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>`;
+  } else {
+    progress.innerHTML = '';
+  }
+
+  countEl.innerHTML = `<em>${receipts.length}</em> receipt${receipts.length !== 1 ? 's' : ''} filed${receipts.length >= needed ? ' // <em>patterns active</em>' : ''}`;
+
+  container.innerHTML = [...receipts].reverse().map((r, i) => {
+    const idx = receipts.length - 1 - i;
+    return `<div class="receipt-card" id="card-${idx}">
+      <div class="receipt-top">
+        <div class="receipt-meta">
+          <div class="receipt-mood">
+            <div class="mood-pill">${r.moodEmoji} <span class="mlabel">${r.mood.toUpperCase()}</span></div>
+            <span class="receipt-num">#${String(idx + 1).padStart(3,'0')}</span>
+          </div>
+          <div class="receipt-time">${timeAgo(r.ts)}</div>
+        </div>
+        <div class="receipt-text">"${esc(r.text)}"</div>
+      </div>
+      <div class="roast-section">
+        <div class="roast-header">// MISTY'S VERDICT</div>
+        <div class="roast-text">${esc(r.roast)}</div>
+        <div class="roast-diagnosis">${esc(r.diagnosis)}</div>
+      </div>
+      <div class="reality-section">
+        <div class="reality-header">// REALITY CHECK</div>
+        <div class="reality-text">${esc(r.realityCheck)}</div>
+        <div class="reality-verdict">✓ NOT TRIPPING</div>
+      </div>
+      <div class="card-actions">
+        <button class="card-btn" onclick="copyReceipt(${idx})">📋 copy</button>
+        <button class="card-btn card-btn-delete" onclick="deleteReceipt(${idx})">× delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderArchetypes() {
+  const grid = document.getElementById('archetypeGrid');
+  const levelLabels = {1:'LEVEL 01 — RECOGNIZABLE',2:'LEVEL 02 — CONCERNING',3:'LEVEL 03 — SERIOUS',4:'LEVEL 04 — CRITICAL'};
+  grid.innerHTML = [1,2,3,4].map(lvl => {
+    const items = ARCHETYPES.filter(a => a.level === lvl);
+    return `<div class="archetype-level">// ${levelLabels[lvl]}</div>` +
+      items.map(a => `<div class="archetype-item">
+        <div class="archetype-name">${a.emoji} ${a.name} <span class="archetype-num">L${a.level}</span></div>
+        <div class="archetype-quote">"${a.tagline}"</div>
+        <div class="archetype-advice-row">
+          <span class="advice-arrow">→</span>
           <div>
-            <div class="archetype-name">The Reality Distorter</div>
-            <div class="archetype-tagline">"You were there. You saw it. Apparently neither of those things happened."</div>
+            <div class="archetype-advice-label">${a.antidoteName}</div>
+            <div class="archetype-advice-text">${a.antidote}</div>
           </div>
         </div>
-        <span class="level-badge level-3">L3</span>
-      </div>
-      <div class="archetype-body">
-        <p class="archetype-desc">Consistently rewrites events after the fact. Your clear memory of what happened is presented as confusion or misinterpretation.</p>
-        <div class="archetype-antidote">
-          <strong>💊 The Receipt Keeper</strong>
-          Document. Document. Document. Your memory is accurate — and receipts don't lie.
-        </div>
-      </div>
-    </div>
-    <div class="archetype-card">
-      <div class="archetype-header">
-        <div class="archetype-name-group">
-          <span class="archetype-emoji">🥅</span>
-          <div>
-            <div class="archetype-name">The Moving Goalpost</div>
-            <div class="archetype-tagline">"You meet the standard. The standard moves. Always."</div>
-          </div>
-        </div>
-        <span class="level-badge level-2">L2</span>
-      </div>
-      <div class="archetype-body">
-        <p class="archetype-desc">Whatever you do is never quite enough. Once you achieve what was asked, the criteria shift. Perfection is not the goal — your perpetual inadequacy is.</p>
-        <div class="archetype-antidote">
-          <strong>💊 The Boundary Setter</strong>
-          Stop running toward the goalpost. It will keep moving. Decide if you want to play this game.
-        </div>
-      </div>
-    </div>
-    <div class="archetype-card">
-      <div class="archetype-header">
-        <div class="archetype-name-group">
-          <span class="archetype-emoji">🏗️</span>
-          <div>
-            <div class="archetype-name">The Alternate Reality Architect</div>
-            <div class="archetype-tagline">"They built a narrative where they're always right."</div>
-          </div>
-        </div>
-        <span class="level-badge level-4">L4</span>
-      </div>
-      <div class="archetype-body">
-        <p class="archetype-desc">Constructs an elaborate alternative version of events in which their behavior is always justified and your perspective is always flawed.</p>
-        <div class="archetype-antidote">
-          <strong>💊 The External Validator</strong>
-          You cannot win an argument inside someone else's constructed reality. External support helps.
-        </div>
-      </div>
-    </div>
-  </div>
-  <p class="archetypes-unlock">+ 7 more archetypes unlock after 10 receipts — including The Deflector, The Weaponized Silence Expert, and The Emotional Accountant.</p>
-</section>
+      </div>`).join('');
+  }).join('');
+}
 
-<!-- ── Quotes ─────────────────────────────────────────────────────────────────── -->
-<section class="quotes">
-  <span class="section-label">Receipts filed</span>
-  <h2 class="section-title">People who needed this.</h2>
-  <p class="section-sub">From the group chat to the note app to here. Misty has seen things.</p>
-  <div class="quotes-grid">
-    <div class="quote-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote-text">"I filed three receipts in the first hour. Misty called it 'Selective Amnesia Syndrome™' and I felt seen for the first time in months."</p>
-      <div class="quote-author">
-        <div class="quote-avatar" style="background:#EDE9FE">😮‍💨</div>
-        <div>
-          <div class="quote-name">anon, probably</div>
-          <div class="quote-handle">in the group chat rn</div>
-        </div>
-      </div>
+function checkPatterns() {
+  const container = document.getElementById('patternAlertContainer');
+  const detected = detectArchetypes(receipts);
+  if (!detected.length) { container.innerHTML = ''; return; }
+  const top = detected[0];
+  const more = detected.length > 1 ? `<div class="pattern-more">+ ${detected.length - 1} more pattern${detected.length > 2 ? 's' : ''} detected — see Field Guide</div>` : '';
+  container.innerHTML = `<div class="pattern-alert">
+    <div class="pattern-badge">🚨 PATTERN DETECTED</div>
+    <div class="pattern-archetype">${top.emoji} ${top.name}</div>
+    <div class="pattern-quote">"${top.tagline}"</div>
+    <div class="pattern-desc">${top.desc}</div>
+    <div class="counter-archetype">
+      <div class="counter-label">// COUNTER-MOVE</div>
+      <div class="counter-name">${top.antidoteName}</div>
+      <div class="counter-desc">${top.antidote}</div>
     </div>
-    <div class="quote-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote-text">"The Am I Tripping? button should be legally required. The answer was no. It was never going to be yes. But I needed Misty to confirm it."</p>
-      <div class="quote-author">
-        <div class="quote-avatar" style="background:#FCE7F3">🤡</div>
-        <div>
-          <div class="quote-name">definitely not me</div>
-          <div class="quote-handle">crying in the car</div>
-        </div>
-      </div>
-    </div>
-    <div class="quote-card">
-      <div class="stars">★★★★★</div>
-      <p class="quote-text">"After 10 receipts, Misty diagnosed The Moving Goalpost. I cried. Then I screenshotted the archetype card and sent it to my therapist."</p>
-      <div class="quote-author">
-        <div class="quote-avatar" style="background:#FEF9C3">⚡</div>
-        <div>
-          <div class="quote-name">receipts user #247</div>
-          <div class="quote-handle">currently in therapy</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    ${more}
+  </div>`;
+}
 
-<!-- ── CTA ────────────────────────────────────────────────────────────────────── -->
-<section class="cta-section" id="download">
-  <svg class="cta-misty" width="110" height="110" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
-    <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="rgba(255,255,255,.25)"/>
-    <path d="M56.8,92 C24.4,80 6.4,110 15,131 C20.8,143 48.2,131 59.7,102.8 Z" fill="rgba(255,255,255,.15)"/>
-    <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="rgba(255,255,255,.25)"/>
-    <path d="M143.2,92 C175.6,80 193.6,110 185,131 C179.2,143 151.8,131 140.3,102.8 Z" fill="rgba(255,255,255,.15)"/>
-    <ellipse cx="100" cy="116" rx="72" ry="60" fill="rgba(255,255,255,.2)"/>
-    <ellipse cx="100" cy="61" rx="20" ry="8" fill="rgba(255,255,255,.18)"/>
-    <circle cx="75" cy="105" r="18" fill="white" opacity=".9"/>
-    <circle cx="75" cy="106" r="13" fill="#F5C518"/>
-    <circle cx="75" cy="106" r="9" fill="#D4AC0D"/>
-    <circle cx="75" cy="106" r="5" fill="#2A1040"/>
-    <circle cx="71" cy="102" r="3" fill="white"/>
-    <rect x="56" y="87" width="38" height="13" fill="rgba(139,92,246,.6)"/>
-    <circle cx="125" cy="105" r="18" fill="white" opacity=".9"/>
-    <circle cx="125" cy="106" r="13" fill="#F5C518"/>
-    <circle cx="125" cy="106" r="9" fill="#D4AC0D"/>
-    <circle cx="125" cy="106" r="5" fill="#2A1040"/>
-    <circle cx="121" cy="102" r="3" fill="white"/>
-    <rect x="106" y="87" width="38" height="13" fill="rgba(139,92,246,.6)"/>
-    <polygon points="100,130 93,125 107,125" fill="#FFAFCC"/>
-    <path d="M87,138 C96,143 108,142 115,137" fill="none" stroke="#2A1040" stroke-width="2.4" stroke-opacity=".55" stroke-linecap="round"/>
-  </svg>
-  <h2>Ready to start<br>filing your truth?</h2>
-  <p>Misty is standing by. The archive is open. Your memory was never the problem — and now you'll have proof.</p>
-  <a href="#" class="cta-btn">📲 Download for Android</a>
-</section>
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function switchView(name, tabEl, bnavEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (tabEl) tabEl.classList.add('active');
+  if (bnavEl) bnavEl.classList.add('active');
+  const bnavMap = {drop:'bnav-drop',feed:'bnav-feed',archetypes:'bnav-archetypes',phases:'bnav-phases'};
+  const tabMap = {drop:0,feed:1,archetypes:2,phases:3};
+  if (bnavMap[name]) document.getElementById(bnavMap[name]).classList.add('active');
+  if (tabMap[name] !== undefined) document.querySelectorAll('.nav-tab')[tabMap[name]].classList.add('active');
+  if (name === 'feed') renderFeed();
+  if (name === 'archetypes') renderArchetypes();
+}
 
-<!-- ── Footer ─────────────────────────────────────────────────────────────────── -->
-<footer>
-  <div class="footer-left">
-    <div class="footer-logo">
-      <svg width="28" height="28" viewBox="-20 5 240 195" xmlns="http://www.w3.org/2000/svg">
-        <path d="M60.4,83 C13.6,68 -11.6,104 -0.8,137 C6.4,155 42.4,137 67.6,98 Z" fill="#9B59B6"/>
-        <path d="M139.6,83 C186.4,68 211.6,104 200.8,137 C193.6,155 157.6,137 132.4,98 Z" fill="#9B59B6"/>
-        <ellipse cx="100" cy="116" rx="72" ry="60" fill="#9B59B6"/>
-        <circle cx="75" cy="105" r="14" fill="white"/>
-        <circle cx="75" cy="106" r="9" fill="#F5C518"/>
-        <circle cx="75" cy="106" r="4" fill="#2A1040"/>
-        <rect x="61" y="91" width="28" height="10" fill="#9B59B6"/>
-        <circle cx="125" cy="105" r="14" fill="white"/>
-        <circle cx="125" cy="106" r="9" fill="#F5C518"/>
-        <circle cx="125" cy="106" r="4" fill="#2A1040"/>
-        <rect x="111" y="91" width="28" height="10" fill="#9B59B6"/>
-      </svg>
-      Receipts
-    </div>
-    <div class="footer-tagline">Because your memory isn't the problem.</div>
-  </div>
-  <div class="footer-right">Made by Softbite Studio · 2025</div>
-</footer>
+function selectMood(el, emoji, key) {
+  document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  activeMood = { emoji, key };
+  document.getElementById('inlineReality').style.display = 'none';
+}
 
+function submitReceipt() {
+  const text = document.getElementById('dropInput').value.trim();
+  if (!text) { showToast('write something first.'); return; }
+  if (!activeMood) { showToast('pick a mood tag.'); return; }
+
+  const r = {
+    text,
+    mood: activeMood.key,
+    moodEmoji: activeMood.emoji,
+    ts: Date.now(),
+    roast: buildRoast(text, activeMood.key),
+    diagnosis: buildDiagnosis(text, activeMood.key),
+    realityCheck: buildRealityCheck(activeMood.key)
+  };
+
+  receipts.push(r);
+  save();
+
+  document.getElementById('dropInput').value = '';
+  document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('selected'));
+  document.getElementById('inlineReality').style.display = 'none';
+  activeMood = null;
+  document.getElementById('logCountBadge').textContent = receipts.length;
+  checkPatterns();
+  showToast('receipt filed. 🧾');
+
+  setTimeout(() => switchView('feed'), 550);
+}
+
+function amITripping() {
+  const text = document.getElementById('dropInput').value.trim();
+  const mood = activeMood?.key || 'dead';
+  const check = buildRealityCheck(mood);
+  const el = document.getElementById('inlineReality');
+  document.getElementById('inlineRealityText').textContent = check;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyReceipt(idx) {
+  const r = receipts[idx];
+  if (!r) return;
+  const text = `🧾 RECEIPT #${String(idx+1).padStart(3,'0')}\n"${r.text}"\n\nMood: ${r.moodEmoji} ${r.mood.toUpperCase()}\nDiagnosis: ${r.diagnosis}\n\nMisty says:\n"${r.roast}"\n\nvia Receipts — Because your memory isn't the problem.`;
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('copied. share wisely.'))
+    .catch(() => showToast('copy failed.'));
+}
+
+function deleteReceipt(idx) {
+  receipts.splice(idx, 1);
+  save();
+  checkPatterns();
+  renderFeed();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+renderArchetypes();
+checkPatterns();
+document.getElementById('logCountBadge').textContent = receipts.length;
+</script>
 </body>
 </html>
